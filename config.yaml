@@ -1,0 +1,37 @@
+# LLM配置
+llm:
+  base_url: "http://localhost:8000/v1"  # Qwen3服务地址
+  model_name: "Qwen3-14B-Chat"
+  temperature: 0.7
+  max_tokens: 2048
+
+# 系统配置
+system:
+  seed_mcp_count: 10
+  mcp_abstraction_threshold: 3  # 相似任务≥3个时触发抽象
+  success_rate_threshold: 0.8   # 成功率>80%才抽象
+
+# DQN配置
+dqn:
+  state_dim: 768  # SBERT嵌入维度
+  action_emb_dim: 768
+  hidden_dim: 256
+  learning_rate: 0.001
+  gamma: 0.99
+  epsilon_start: 0.9
+  epsilon_end: 0.1
+  epsilon_decay: 0.995
+  replay_buffer_size: 10000
+  batch_size: 32
+
+# 检索配置
+retrieval:
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  top_k: 5
+
+# 实验配置
+experiment:
+  num_queries: 100
+  checkpoint_interval: 20
+  log_dir: "./outputs/logs"
+  model_save_dir: "./outputs/models"
