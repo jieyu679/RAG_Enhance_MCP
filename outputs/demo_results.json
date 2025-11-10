@@ -1,0 +1,247 @@
+{
+  "queries": [
+    "Calculate the sum of numbers from 1 to 100 and analyze the result",
+    "Extract all person names from the following text and sort them alphabetically: Zhang San is a friend of Li Si, and Wang Wu also knows them",
+    "Compare sales data between 2023 and 2024, and generate a summary report",
+    "Search for recent AI news, extract key information and summarize",
+    "Convert the following data to JSON format: name=Zhang San, age=25, city=Beijing"
+  ],
+  "results": [
+    {
+      "success": true,
+      "tasks": [
+        {
+          "id": "task_1",
+          "description": "Calculate the sum of all integers from 1 to 100 using mathematical computation.",
+          "candidate_mcps": [
+            "mcp_calculate"
+          ],
+          "depends_on": [],
+          "status": "success",
+          "selected_mcp": "mcp_search"
+        },
+        {
+          "id": "task_2",
+          "description": "Analyze the result of the sum by computing its mean, standard deviation, and identifying any notable statistical properties.",
+          "candidate_mcps": [
+            "mcp_analyze"
+          ],
+          "depends_on": [
+            "task_1"
+          ],
+          "status": "success",
+          "selected_mcp": "mcp_extract"
+        },
+        {
+          "id": "task_3",
+          "description": "Generate a concise summary of the calculation and analysis results for clarity and presentation.",
+          "candidate_mcps": [
+            "mcp_summarize"
+          ],
+          "depends_on": [
+            "task_1",
+            "task_2"
+          ],
+          "status": "success",
+          "selected_mcp": "mcp_sort"
+        }
+      ],
+      "episode_reward": 43.2,
+      "execution_time": 3.076747417449951,
+      "mcp_box_size": 11
+    },
+    {
+      "success": true,
+      "tasks": [
+        {
+          "id": "task_1",
+          "description": "Extract all person names from the given text",
+          "candidate_mcps": [
+            "mcp_extract"
+          ],
+          "depends_on": [],
+          "status": "success",
+          "selected_mcp": "mcp_generate"
+        },
+        {
+          "id": "task_2",
+          "description": "Sort the extracted person names alphabetically",
+          "candidate_mcps": [
+            "mcp_sort"
+          ],
+          "depends_on": [
+            "task_1"
+          ],
+          "status": "success",
+          "selected_mcp": "mcp_extract"
+        }
+      ],
+      "episode_reward": 28.8,
+      "execution_time": 1.5922038555145264,
+      "mcp_box_size": 11
+    },
+    {
+      "success": true,
+      "tasks": [
+        {
+          "id": "task_1",
+          "description": "Extract sales data from the source for the year 2023.",
+          "candidate_mcps": [
+            "mcp_extract"
+          ],
+          "depends_on": [],
+          "status": "success",
+          "selected_mcp": "mcp_search"
+        },
+        {
+          "id": "task_2",
+          "description": "Extract sales data from the source for the year 2024.",
+          "candidate_mcps": [
+            "mcp_extract"
+          ],
+          "depends_on": [],
+          "status": "success",
+          "selected_mcp": "mcp_generate"
+        },
+        {
+          "id": "task_3",
+          "description": "Compare the sales data between 2023 and 2024 to identify trends and differences.",
+          "candidate_mcps": [
+            "mcp_compare"
+          ],
+          "depends_on": [
+            "task_1",
+            "task_2"
+          ],
+          "status": "success",
+          "selected_mcp": "mcp_c357bdaf"
+        },
+        {
+          "id": "task_4",
+          "description": "Calculate the total sales and average monthly sales for both 2023 and 2024.",
+          "candidate_mcps": [
+            "mcp_calculate"
+          ],
+          "depends_on": [
+            "task_1",
+            "task_2"
+          ],
+          "status": "success",
+          "selected_mcp": "mcp_filter"
+        },
+        {
+          "id": "task_5",
+          "description": "Generate a structured summary report that includes key findings from the comparison and calculations.",
+          "candidate_mcps": [
+            "mcp_generate"
+          ],
+          "depends_on": [
+            "task_3",
+            "task_4"
+          ],
+          "status": "success",
+          "selected_mcp": "mcp_summarize"
+        }
+      ],
+      "episode_reward": 70.0,
+      "execution_time": 4.50934624671936,
+      "mcp_box_size": 11
+    },
+    {
+      "success": true,
+      "tasks": [
+        {
+          "id": "task_1",
+          "description": "Search for recent AI-related news articles from reliable sources",
+          "candidate_mcps": [
+            "mcp_search"
+          ],
+          "depends_on": [],
+          "status": "success",
+          "selected_mcp": "mcp_generate"
+        },
+        {
+          "id": "task_2",
+          "description": "Extract key information such as headlines, publication dates, sources, and main topics from the retrieved news articles",
+          "candidate_mcps": [
+            "mcp_extract"
+          ],
+          "depends_on": [
+            "task_1"
+          ],
+          "status": "success",
+          "selected_mcp": "mcp_c357bdaf"
+        },
+        {
+          "id": "task_3",
+          "description": "Generate a concise summary of the key points from the extracted news information",
+          "candidate_mcps": [
+            "mcp_summarize"
+          ],
+          "depends_on": [
+            "task_2"
+          ],
+          "status": "success",
+          "selected_mcp": "mcp_c357bdaf"
+        }
+      ],
+      "episode_reward": 39.2,
+      "execution_time": 3.074944019317627,
+      "mcp_box_size": 11
+    },
+    {
+      "success": true,
+      "tasks": [
+        {
+          "id": "task_1",
+          "description": "Extract the key-value pairs from the input data string",
+          "candidate_mcps": [
+            "mcp_extract"
+          ],
+          "depends_on": [],
+          "status": "success",
+          "selected_mcp": "mcp_compare"
+        },
+        {
+          "id": "task_2",
+          "description": "Convert the extracted key-value pairs into a structured dictionary format",
+          "candidate_mcps": [
+            "mcp_transform"
+          ],
+          "depends_on": [
+            "task_1"
+          ],
+          "status": "success",
+          "selected_mcp": "mcp_extract"
+        },
+        {
+          "id": "task_3",
+          "description": "Convert the dictionary structure into a valid JSON string",
+          "candidate_mcps": [
+            "mcp_transform"
+          ],
+          "depends_on": [
+            "task_2"
+          ],
+          "status": "success",
+          "selected_mcp": "mcp_compare"
+        }
+      ],
+      "episode_reward": 43.2,
+      "execution_time": 2.075618267059326,
+      "mcp_box_size": 11
+    }
+  ],
+  "statistics": {
+    "total_queries": 5,
+    "avg_reward": 44.879999999999995,
+    "mcp_box_stats": {
+      "total_mcps": 11,
+      "total_executions": 34,
+      "overall_success_rate": 1.0,
+      "avg_success_rate": 0.9090909090909091
+    },
+    "dqn_epsilon": 0.9,
+    "dqn_training_steps": 0
+  }
+}

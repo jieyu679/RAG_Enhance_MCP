@@ -1,0 +1,157 @@
+{
+  "mcp_search": {
+    "id": "mcp_search",
+    "name": "信息搜索",
+    "capability_description": "从给定文本或数据源中搜索特定信息",
+    "parameters": {
+      "query": "搜索关键词",
+      "source": "数据源"
+    },
+    "success_count": 3,
+    "failure_count": 0,
+    "success_rate": 1.0,
+    "examples": []
+  },
+  "mcp_calculate": {
+    "id": "mcp_calculate",
+    "name": "数值计算",
+    "capability_description": "执行数学计算，包括加减乘除、统计等",
+    "parameters": {
+      "expression": "数学表达式",
+      "data": "输入数据"
+    },
+    "success_count": 2,
+    "failure_count": 0,
+    "success_rate": 1.0,
+    "examples": []
+  },
+  "mcp_summarize": {
+    "id": "mcp_summarize",
+    "name": "文本总结",
+    "capability_description": "对给定文本进行摘要和总结",
+    "parameters": {
+      "text": "待总结的文本",
+      "max_length": "最大长度"
+    },
+    "success_count": 1,
+    "failure_count": 0,
+    "success_rate": 1.0,
+    "examples": []
+  },
+  "mcp_extract": {
+    "id": "mcp_extract",
+    "name": "信息提取",
+    "capability_description": "从文本中提取结构化信息，如日期、人名、地点等",
+    "parameters": {
+      "text": "输入文本",
+      "target_type": "提取类型"
+    },
+    "success_count": 3,
+    "failure_count": 0,
+    "success_rate": 1.0,
+    "examples": []
+  },
+  "mcp_transform": {
+    "id": "mcp_transform",
+    "name": "格式转换",
+    "capability_description": "将数据从一种格式转换为另一种格式",
+    "parameters": {
+      "input_format": "输入格式",
+      "output_format": "输出格式"
+    },
+    "success_count": 0,
+    "failure_count": 0,
+    "success_rate": 0.0,
+    "examples": []
+  },
+  "mcp_analyze": {
+    "id": "mcp_analyze",
+    "name": "数据分析",
+    "capability_description": "对数据进行统计分析，计算均值、趋势等",
+    "parameters": {
+      "data": "输入数据",
+      "analysis_type": "分析类型"
+    },
+    "success_count": 4,
+    "failure_count": 0,
+    "success_rate": 1.0,
+    "examples": []
+  },
+  "mcp_generate": {
+    "id": "mcp_generate",
+    "name": "内容生成",
+    "capability_description": "根据要求生成文本、表格或其他内容",
+    "parameters": {
+      "template": "生成模板",
+      "parameters": "参数"
+    },
+    "success_count": 5,
+    "failure_count": 0,
+    "success_rate": 1.0,
+    "examples": []
+  },
+  "mcp_compare": {
+    "id": "mcp_compare",
+    "name": "信息对比",
+    "capability_description": "比较两个或多个对象的异同",
+    "parameters": {
+      "items": "待比较项",
+      "criteria": "比较标准"
+    },
+    "success_count": 1,
+    "failure_count": 0,
+    "success_rate": 1.0,
+    "examples": []
+  },
+  "mcp_sort": {
+    "id": "mcp_sort",
+    "name": "数据排序",
+    "capability_description": "对数据按指定规则进行排序",
+    "parameters": {
+      "data": "输入数据",
+      "key": "排序键"
+    },
+    "success_count": 2,
+    "failure_count": 0,
+    "success_rate": 1.0,
+    "examples": []
+  },
+  "mcp_filter": {
+    "id": "mcp_filter",
+    "name": "数据筛选",
+    "capability_description": "根据条件筛选数据",
+    "parameters": {
+      "data": "输入数据",
+      "condition": "筛选条件"
+    },
+    "success_count": 4,
+    "failure_count": 0,
+    "success_rate": 1.0,
+    "examples": []
+  },
+  "mcp_c357bdaf": {
+    "id": "mcp_c357bdaf",
+    "name": "查询用户{user_name}的订单历史",
+    "capability_description": "根据用户姓名查询其订单历史信息",
+    "parameters": {
+      "user_name": "用户的姓名，用于标识特定用户"
+    },
+    "success_count": 6,
+    "failure_count": 0,
+    "success_rate": 1.0,
+    "examples": [
+      {
+        "task": "将计算结果和分析结果整理为结构化摘要",
+        "output": "{\n  \"计算结果\": 5050,\n  \"分析结果\": {\n    \"平均值\": 5050,\n    \"总数量\": 1\n  }\n}"
+      },
+      {
+        "task": "将提取出的人名列表进行去重处理",
+        "output": "[]"
+      },
+      {
+        "task": "将去重后的人名按字母顺序进行排序",
+        "output": "[]"
+      }
+    ]
+  }
+}

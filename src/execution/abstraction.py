@@ -5,13 +5,13 @@ from collections import defaultdict
 import uuid
 
 class RawMCPPool:
-    """原始MCP池（存储成功的任务执行）"""
+    """Raw MCP Pool (stores successful task executions)"""
     
     def __init__(self):
         self.successful_tasks = []
     
     def add(self, task: Task, mcp: MCPMetadata, result: ExecutionResult):
-        """添加成功的任务"""
+        """Add successful task"""
         self.successful_tasks.append({
             "task": task,
             "mcp": mcp,
@@ -19,13 +19,13 @@ class RawMCPPool:
         })
     
     def find_similar_clusters(self, threshold: int = 3) -> List[List[dict]]:
-        """找到相似任务簇（简化版：基于MCP ID分组）"""
-        # 按MCP ID分组
+        """Find similar task clusters (simplified: group by MCP ID)"""
+        # Group by MCP ID
         mcp_groups = defaultdict(list)
         for item in self.successful_tasks:
             mcp_groups[item["mcp"].id].append(item)
         
-        # 筛选出数量>=threshold的组
+        # Filter groups with count >= threshold
         clusters = []
         for mcp_id, items in mcp_groups.items():
             if len(items) >= threshold:
@@ -34,7 +34,7 @@ class RawMCPPool:
         return clusters
 
 class MCPAbstractionPipeline:
-    """MCP抽象流水线"""
+    """MCP Abstraction Pipeline"""
     
     def __init__(self, llm_client: Qwen3Client, success_rate_threshold: float = 0.8):
         self.llm = llm_client
@@ -42,67 +42,67 @@ class MCPAbstractionPipeline:
     
     def abstract(self, similar_tasks: List[dict]) -> Optional[MCPMetadata]:
         """
-        从相似任务中抽象出新MCP
+        Abstract new MCP from similar tasks
         
         Args:
-            similar_tasks: 相似任务列表（包含task, mcp, result）
+            similar_tasks: List of similar tasks (including task, mcp, result)
         
         Returns:
-            新的MCP或None
+            New MCP or None
         """
         if len(similar_tasks) < 3:
             return None
         
-        # 计算成功率
+        # Calculate success rate
         success_count = sum(1 for item in similar_tasks if item["result"].success)
         success_rate = success_count / len(similar_tasks)
         
         if success_rate < self.success_rate_threshold:
-            print(f"⚠️ 成功率 {success_rate:.2f} 低于阈值 {self.success_rate_threshold}，跳过抽象")
+            print(f"⚠️ Success rate {success_rate:.2f} below threshold {self.success_rate_threshold}, skipping abstraction")
             return None
         
-        # 阶段1: 参数泛化
+        # Stage 1: Parameter generalization
         generalized = self._generalize_parameters(similar_tasks)
         if generalized is None:
             return None
         
-        # 阶段2: 生成文档
+        # Stage 2: Generate documentation
         documented = self._generate_documentation(generalized, similar_tasks)
         
         return documented
     
     def _generalize_parameters(self, similar_tasks: List[dict]) -> Optional[Dict]:
-        """参数泛化（使用LLM）"""
+        """Parameter generalization (using LLM)"""
         task_descriptions = "\n".join([
             f"- {item['task'].description}"
-            for item in similar_tasks[:5]  # 最多5个示例
+            for item in similar_tasks[:5]  # Max 5 examples
         ])
         
         prompt = f"""
-以下是几个成功执行的相似任务：
+Here are several successfully executed similar tasks:
 {task_descriptions}
 
-请提取出通用模式，将具体值替换为参数。
+Please extract the common pattern and replace specific values with parameters.
 
-示例：
-任务1: "查询用户张三的订单历史"
-任务2: "查询用户李四的订单历史"
-抽象: "查询用户{{user_name}}的订单历史"
+Example:
+Task 1: "Query order history for user Zhang San"
+Task 2: "Query order history for user Li Si"
+Abstraction: "Query order history for user {{user_name}}"
 
-输出JSON格式:
+Output JSON format:
 {{
-  "template": "泛化后的任务描述模板",
+  "template": "Generalized task description template",
   "parameters": {{
-    "param_name": "参数描述"
+    "param_name": "Parameter description"
   }},
-  "capability": "这个MCP的能力描述（一句话）"
+  "capability": "Capability description of this MCP (one sentence)"
 }}
 
-只输出JSON，不要其他文字。
+Output only JSON, no other text.
 """
         
         messages = [
-            {"role": "system", "content": "你是MCP抽象专家。"},
+            {"role": "system", "content": "You are an MCP abstraction expert."},
             {"role": "user", "content": prompt}
         ]
         
@@ -110,20 +110,20 @@ class MCPAbstractionPipeline:
         return result
     
     def _generate_documentation(self, generalized: Dict, examples: List[dict]) -> MCPMetadata:
-        """生成文档"""
+        """Generate documentation"""
         mcp_id = f"mcp_{uuid.uuid4().hex[:8]}"
         
-        # 提取示例
+        # Extract examples
         example_list = []
         for item in examples[:3]:
             example_list.append({
                 "task": item["task"].description,
-                "output": str(item["result"].output)[:200]  # 截断
+                "output": str(item["result"].output)[:200]  # Truncate
             })
         
         mcp = MCPMetadata(
             id=mcp_id,
-            name=generalized.get("template", "未命名MCP"),
+            name=generalized.get("template", "Unnamed MCP"),
             capability_description=generalized.get("capability", ""),
             parameters=generalized.get("parameters", {}),
             success_count=sum(1 for item in examples if item["result"].success),

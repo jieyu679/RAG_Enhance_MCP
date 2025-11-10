@@ -4,37 +4,37 @@ from src.core.llm_client import Qwen3Client
 import uuid
 
 class Decomposer:
-    """任务分解智能体"""
+    """Task Decomposition Agent"""
     
     def __init__(self, llm_client: Qwen3Client):
         self.llm = llm_client
     
     def decompose(self, query: str, mcp_box: List[MCPMetadata]) -> PlanningResult:
         """
-        将用户查询分解为任务DAG
+        Decompose user query into a task DAG
         
         Args:
-            query: 用户查询
-            mcp_box: 可用的MCP列表（只包含元数据）
+            query: User query
+            mcp_box: Available MCP list (metadata only)
         
         Returns:
-            PlanningResult包含任务列表
+            PlanningResult containing task list
         """
-        # 构建提示词
+        # Build prompt
         prompt = self._build_prompt(query, mcp_box)
         
         messages = [
-            {"role": "system", "content": "你是一个专业的任务分解专家。"},
+            {"role": "system", "content": "You are an expert in task decomposition."},
             {"role": "user", "content": prompt}
         ]
         
-        # 调用LLM
+        # Call LLM
         result = self.llm.generate_json(messages)
         
         if result is None:
-            return PlanningResult(tasks=[], is_valid=False, feedback="LLM返回格式错误")
+            return PlanningResult(tasks=[], is_valid=False, feedback="LLM returned invalid format")
         
-        # 解析任务
+        # Parse tasks
         tasks = []
         for task_data in result.get("tasks", []):
             task = Task(
@@ -48,45 +48,45 @@ class Decomposer:
         return PlanningResult(tasks=tasks, is_valid=True)
     
     def _build_prompt(self, query: str, mcp_box: List[MCPMetadata]) -> str:
-        """构建分解提示词"""
+        """Build decomposition prompt"""
         mcp_descriptions = "\n".join([
             f"- {mcp.id}: {mcp.name} - {mcp.capability_description}"
             for mcp in mcp_box
         ])
         
         prompt = f"""
-你是一个任务分解专家。请将用户的复杂查询分解为可执行的子任务序列。
+You are a task decomposition expert. Please decompose the user's complex query into executable sub-tasks.
 
-可用工具(MCP):
+Available Tools (MCPs):
 {mcp_descriptions}
 
-用户查询: {query}
+User Query: {query}
 
-请将查询分解为3-7个子任务。每个任务需要:
-1. 清晰的描述（一句话）
-2. 推荐的MCP工具（从上述列表选择1-3个候选）
-3. 依赖的前置任务（task_id列表，如果没有则为空）
+Please decompose the query into 3-7 sub-tasks. For each task, specify:
+1. Clear description (one sentence)
+2. Recommended MCP tools (select 1-3 candidates from the list above)
+3. Dependencies on prerequisite tasks (list of task_ids, empty if none)
 
-分解原则:
-- 每个任务应该是原子性的（不可再分）
-- 任务之间的依赖关系要明确
-- 选择的MCP要与任务描述匹配
-- 考虑任务之间的并行执行可能性
+Decomposition Principles:
+- Each task should be atomic (cannot be further divided)
+- Dependencies between tasks must be clear
+- Selected MCPs should match the task description
+- Consider parallel execution possibilities between tasks
 
-输出严格的JSON格式:
+Output in strict JSON format:
 {{
   "tasks": [
     {{
       "id": "task_1",
-      "description": "任务描述",
+      "description": "Task description",
       "candidate_mcps": ["mcp_id_1", "mcp_id_2"],
       "depends_on": [],
-      "rationale": "为什么需要这个任务的简短说明"
+      "rationale": "Brief explanation of why this task is needed"
     }}
   ],
-  "reasoning": "整体分解思路"
+  "reasoning": "Overall decomposition reasoning"
 }}
 
-请只输出JSON，不要有其他文字。
+Output only JSON, no other text.
 """
         return prompt

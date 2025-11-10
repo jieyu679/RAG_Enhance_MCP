@@ -6,143 +6,143 @@ from src.core.data_structures import MCPMetadata
 import os
 
 def initialize_seed_mcps():
-    """初始化种子MCP"""
+    """Initialize seed MCPs"""
     seed_mcps = [
         MCPMetadata(
             id="mcp_search",
-            name="信息搜索",
-            capability_description="从给定文本或数据源中搜索特定信息",
-            parameters={"query": "搜索关键词", "source": "数据源"}
+            name="Information Search",
+            capability_description="Search for specific information from given text or data sources",
+            parameters={"query": "Search keywords", "source": "Data source"}
         ),
         MCPMetadata(
             id="mcp_calculate",
-            name="数值计算",
-            capability_description="执行数学计算，包括加减乘除、统计等",
-            parameters={"expression": "数学表达式", "data": "输入数据"}
+            name="Numerical Calculation",
+            capability_description="Perform mathematical calculations including arithmetic and statistics",
+            parameters={"expression": "Mathematical expression", "data": "Input data"}
         ),
         MCPMetadata(
             id="mcp_summarize",
-            name="文本总结",
-            capability_description="对给定文本进行摘要和总结",
-            parameters={"text": "待总结的文本", "max_length": "最大长度"}
+            name="Text Summarization",
+            capability_description="Summarize and abstract given text",
+            parameters={"text": "Text to summarize", "max_length": "Maximum length"}
         ),
         MCPMetadata(
             id="mcp_extract",
-            name="信息提取",
-            capability_description="从文本中提取结构化信息，如日期、人名、地点等",
-            parameters={"text": "输入文本", "target_type": "提取类型"}
+            name="Information Extraction",
+            capability_description="Extract structured information from text, such as dates, names, locations",
+            parameters={"text": "Input text", "target_type": "Extraction type"}
         ),
         MCPMetadata(
             id="mcp_transform",
-            name="格式转换",
-            capability_description="将数据从一种格式转换为另一种格式",
-            parameters={"input_format": "输入格式", "output_format": "输出格式"}
+            name="Format Conversion",
+            capability_description="Convert data from one format to another",
+            parameters={"input_format": "Input format", "output_format": "Output format"}
         ),
         MCPMetadata(
             id="mcp_analyze",
-            name="数据分析",
-            capability_description="对数据进行统计分析，计算均值、趋势等",
-            parameters={"data": "输入数据", "analysis_type": "分析类型"}
+            name="Data Analysis",
+            capability_description="Perform statistical analysis on data, compute means, trends, etc.",
+            parameters={"data": "Input data", "analysis_type": "Analysis type"}
         ),
         MCPMetadata(
             id="mcp_generate",
-            name="内容生成",
-            capability_description="根据要求生成文本、表格或其他内容",
-            parameters={"template": "生成模板", "parameters": "参数"}
+            name="Content Generation",
+            capability_description="Generate text, tables or other content based on requirements",
+            parameters={"template": "Generation template", "parameters": "Parameters"}
         ),
         MCPMetadata(
             id="mcp_compare",
-            name="信息对比",
-            capability_description="比较两个或多个对象的异同",
-            parameters={"items": "待比较项", "criteria": "比较标准"}
+            name="Information Comparison",
+            capability_description="Compare similarities and differences between two or more objects",
+            parameters={"items": "Items to compare", "criteria": "Comparison criteria"}
         ),
         MCPMetadata(
             id="mcp_sort",
-            name="数据排序",
-            capability_description="对数据按指定规则进行排序",
-            parameters={"data": "输入数据", "key": "排序键"}
+            name="Data Sorting",
+            capability_description="Sort data according to specified rules",
+            parameters={"data": "Input data", "key": "Sorting key"}
         ),
         MCPMetadata(
             id="mcp_filter",
-            name="数据筛选",
-            capability_description="根据条件筛选数据",
-            parameters={"data": "输入数据", "condition": "筛选条件"}
+            name="Data Filtering",
+            capability_description="Filter data based on conditions",
+            parameters={"data": "Input data", "condition": "Filter condition"}
         )
     ]
     
-    # 保存种子MCP
+    # Save seed MCPs
     mcp_box = DynamicMCPBox()
     for mcp in seed_mcps:
         mcp_box.add_mcp(mcp)
-    print(f"✅ 初始化了 {len(seed_mcps)} 个种子MCP")
+    print(f"✅ Initialized {len(seed_mcps)} seed MCPs")
 
 def load_test_queries():
-    """加载测试查询"""
+    """Load test queries"""
     queries = [
-        "计算1到100的和并分析这个结果",
-        "从以下文本中提取所有人名，然后按字母顺序排序：张三是李四的朋友，王五也认识他们",
-        "比较2023年和2024年的销售数据，生成一份总结报告",
-        "搜索最近的AI新闻，提取关键信息并总结",
-        "将以下数据转换为JSON格式：姓名=张三,年龄=25,城市=北京",
+        "Calculate the sum of numbers from 1 to 100 and analyze the result",
+        "Extract all person names from the following text and sort them alphabetically: Zhang San is a friend of Li Si, and Wang Wu also knows them",
+        "Compare sales data between 2023 and 2024, and generate a summary report",
+        "Search for recent AI news, extract key information and summarize",
+        "Convert the following data to JSON format: name=Zhang San, age=25, city=Beijing",
     ]
     return queries
 
 def run_demo():
-    """运行演示"""
+    """Run demonstration"""
     print("="*70)
-    print("  多智能体协作 + 动态动作空间共同进化系统 Demo")
+    print("  Multi-Agent Collaboration + Dynamic Action Space Co-Evolution Demo")
     print("="*70)
     
-    # 加载配置
+    # Load configuration
     with open("config.yaml", 'r', encoding='utf-8') as f:
         config = yaml.safe_load(f)
     
-    # 检查是否需要初始化
+    # Check if initialization is needed
     if not os.path.exists("./outputs/mcp_box/mcp_box.json"):
-        print("\n首次运行，初始化种子MCP...")
+        print("\nFirst run, initializing seed MCPs...")
         initialize_seed_mcps()
     
-    # 创建系统
-    print("\n初始化系统...")
+    # Create system
+    print("\nInitializing system...")
     system = MultiAgentCoEvolutionSystem(config)
     
-    # 加载测试查询
+    # Load test queries
     queries = load_test_queries()
     
-    print(f"\n准备处理 {len(queries)} 个测试查询\n")
-    input("按Enter开始...")
+    print(f"\nReady to process {len(queries)} test queries\n")
+    input("Press Enter to start...")
     
-    # 处理查询
+    # Process queries
     results = []
     for i, query in enumerate(queries):
         result = system.process_query(query)
         results.append(result)
         
-        # 定期保存
+        # Save periodically
         if (i + 1) % 2 == 0:
             system.save_checkpoint("./outputs/models")
         
-        print("\n暂停3秒...\n")
+        print("\nPausing for 3 seconds...\n")
         import time
         time.sleep(3)
     
-    # 最终统计
+    # Final statistics
     print("\n" + "="*70)
-    print("  实验总结")
+    print("  Experiment Summary")
     print("="*70)
     
     stats = system.get_statistics()
-    print(f"\n总查询数: {stats['total_queries']}")
-    print(f"平均奖励: {stats['avg_reward']:.2f}")
-    print(f"\nMCP Box统计:")
-    print(f"  - 总MCP数: {stats['mcp_box_stats']['total_mcps']}")
-    print(f"  - 总执行次数: {stats['mcp_box_stats']['total_executions']}")
-    print(f"  - 整体成功率: {stats['mcp_box_stats']['overall_success_rate']:.2%}")
-    print(f"\nDQN统计:")
-    print(f"  - 当前ε: {stats['dqn_epsilon']:.3f}")
-    print(f"  - 训练步数: {stats['dqn_training_steps']}")
+    print(f"\nTotal Queries: {stats['total_queries']}")
+    print(f"Average Reward: {stats['avg_reward']:.2f}")
+    print(f"\nMCP Box Statistics:")
+    print(f"  - Total MCPs: {stats['mcp_box_stats']['total_mcps']}")
+    print(f"  - Total Executions: {stats['mcp_box_stats']['total_executions']}")
+    print(f"  - Overall Success Rate: {stats['mcp_box_stats']['overall_success_rate']:.2%}")
+    print(f"\nDQN Statistics:")
+    print(f"  - Current ε: {stats['dqn_epsilon']:.3f}")
+    print(f"  - Training Steps: {stats['dqn_training_steps']}")
     
-    # 保存结果
+    # Save results
     with open("./outputs/demo_results.json", 'w', encoding='utf-8') as f:
         json.dump({
             "queries": queries,
@@ -150,7 +150,7 @@ def run_demo():
             "statistics": stats
         }, f, ensure_ascii=False, indent=2)
     
-    print(f"\n结果已保存到 ./outputs/demo_results.json")
+    print(f"\nResults saved to ./outputs/demo_results.json")
     print("="*70)
 
 if __name__ == "__main__":

@@ -10,15 +10,28 @@ class MCPRetriever:
         print(f"加载嵌入模型: {model_name}")
         self.model = SentenceTransformer(model_name)
         self.mcp_embeddings = {}
+        
+        # 获取嵌入维度
+        test_emb = self.model.encode("test")
+        self.embedding_dim = len(test_emb)
+        print(f"嵌入维度: {self.embedding_dim}")
     
     def encode_task(self, task: Task) -> np.ndarray:
         """编码任务描述"""
-        return self.model.encode(task.description)
+        emb = self.model.encode(task.description, convert_to_numpy=True)
+        # 确保是1D数组
+        if len(emb.shape) == 0:
+            emb = np.array([emb])
+        return emb
     
     def encode_mcp(self, mcp: MCPMetadata) -> np.ndarray:
         """编码MCP"""
         text = f"{mcp.name}: {mcp.capability_description}"
-        return self.model.encode(text)
+        emb = self.model.encode(text, convert_to_numpy=True)
+        # 确保是1D数组
+        if len(emb.shape) == 0:
+            emb = np.array([emb])
+        return emb
     
     def update_embeddings(self, mcps: List[MCPMetadata]):
         """更新MCP嵌入缓存"""
@@ -51,7 +64,13 @@ class MCPRetriever:
         similarities = []
         for mcp in mcps:
             mcp_emb = self.mcp_embeddings[mcp.id]
-            similarity = np.dot(task_emb, mcp_emb) / (np.linalg.norm(task_emb) * np.linalg.norm(mcp_emb))
+            
+            # 确保维度匹配
+            if task_emb.shape != mcp_emb.shape:
+                print(f"⚠️ 维度不匹配: task={task_emb.shape}, mcp={mcp_emb.shape}")
+                continue
+            
+            similarity = np.dot(task_emb, mcp_emb) / (np.linalg.norm(task_emb) * np.linalg.norm(mcp_emb) + 1e-10)
             similarities.append((mcp, similarity))
         
         # 排序并返回top-k

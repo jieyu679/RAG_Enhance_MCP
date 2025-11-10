@@ -4,33 +4,33 @@ from src.core.llm_client import Qwen3Client
 import networkx as nx
 
 class Refiner:
-    """任务验证智能体"""
+    """Task Validation Agent任务验证智能体"""
     
     def __init__(self, llm_client: Qwen3Client):
         self.llm = llm_client
     
     def validate(self, query: str, planning_result: PlanningResult, mcp_box: List[MCPMetadata]) -> PlanningResult:
         """
-        验证任务分解的质量
+        Validate the quality of task decomposition
         
         Args:
-            query: 原始用户查询
-            planning_result: Decomposer的输出
-            mcp_box: 可用MCP列表
+            query: Original user query
+            planning_result: Output from Decomposer
+            mcp_box: Available MCP list
         
         Returns:
-            更新后的PlanningResult（is_valid + feedback）
+            Updated PlanningResult (with is_valid + feedback)
         """
         tasks = planning_result.tasks
         
-        # 检查1: 结构性检查（快速，基于规则）
+        # Check 1: Structural validation (fast, rule-based)
         structure_valid, structure_feedback = self._check_structure(tasks, mcp_box)
         if not structure_valid:
             planning_result.is_valid = False
             planning_result.feedback = structure_feedback
             return planning_result
         
-        # 检查2: 语义检查（使用LLM）
+        # Check 2: Semantic validation (using LLM)
         semantic_valid, semantic_feedback = self._check_semantics(query, tasks, mcp_box)
         if not semantic_valid:
             planning_result.is_valid = False
@@ -38,27 +38,27 @@ class Refiner:
             return planning_result
         
         planning_result.is_valid = True
-        planning_result.feedback = "验证通过"
+        planning_result.feedback = "Validation passed"
         return planning_result
     
     def _check_structure(self, tasks: List[Task], mcp_box: List[MCPMetadata]) -> tuple[bool, str]:
-        """结构性检查"""
+        """Structural validation"""
         if len(tasks) == 0:
-            return False, "任务列表为空"
+            return False, "Task list is empty"
         
         if len(tasks) > 10:
-            return False, "任务数量过多（>10），请简化"
+            return False, "Too many tasks (>10), please simplify"
         
-        # 检查MCP是否存在
+        # Check if MCPs exist
         mcp_ids = {mcp.id for mcp in mcp_box}
         for task in tasks:
             if not task.candidate_mcps:
-                return False, f"任务 {task.id} 没有候选MCP"
+                return False, f"Task {task.id} has no candidate MCPs"
             for mcp_id in task.candidate_mcps:
                 if mcp_id not in mcp_ids:
-                    return False, f"任务 {task.id} 引用了不存在的MCP: {mcp_id}"
+                    return False, f"Task {task.id} references non-existent MCP: {mcp_id}"
         
-        # 检查依赖关系（无循环依赖）
+        # Check dependencies (no circular dependencies)
         G = nx.DiGraph()
         for task in tasks:
             G.add_node(task.id)
@@ -66,23 +66,23 @@ class Refiner:
                 G.add_edge(dep, task.id)
         
         if not nx.is_directed_acyclic_graph(G):
-            return False, "任务依赖关系存在循环"
+            return False, "Task dependencies contain cycles"
         
         return True, ""
     
     def _check_semantics(self, query: str, tasks: List[Task], mcp_box: List[MCPMetadata]) -> tuple[bool, str]:
-        """语义检查（使用LLM）"""
+        """Semantic validation (using LLM)"""
         prompt = self._build_validation_prompt(query, tasks, mcp_box)
         
         messages = [
-            {"role": "system", "content": "你是一个任务规划质量检查专家。"},
+            {"role": "system", "content": "You are an expert in task planning quality assessment."},
             {"role": "user", "content": prompt}
         ]
         
         result = self.llm.generate_json(messages)
         
         if result is None:
-            return True, ""  # LLM失败时默认通过（避免阻塞）
+            return True, ""  # Default to pass if LLM fails (avoid blocking)
         
         is_valid = result.get("is_valid", True)
         issues = result.get("issues", [])
@@ -94,43 +94,43 @@ class Refiner:
         return True, ""
     
     def _build_validation_prompt(self, query: str, tasks: List[Task], mcp_box: List[MCPMetadata]) -> str:
-        """构建验证提示词"""
+        """Build validation prompt"""
         tasks_str = "\n".join([
-            f"- {task.id}: {task.description} (使用: {', '.join(task.candidate_mcps)}, 依赖: {task.depends_on})"
+            f"- {task.id}: {task.description} (Uses: {', '.join(task.candidate_mcps)}, Depends on: {task.depends_on})"
             for task in tasks
         ])
         
         mcp_str = "\n".join([f"- {mcp.id}: {mcp.capability_description}" for mcp in mcp_box])
         
         prompt = f"""
-请评估以下任务分解的质量。
+Please evaluate the quality of the following task decomposition.
 
-原始查询: {query}
+Original Query: {query}
 
-分解的任务:
+Decomposed Tasks:
 {tasks_str}
 
-可用MCP:
+Available MCPs:
 {mcp_str}
 
-评估维度:
-1. 完整性: 所有子任务是否覆盖原查询的需求？
-2. 可行性: 每个任务选择的MCP是否合适？
-3. 逻辑性: 任务顺序和依赖关系是否合理？
+Evaluation Dimensions:
+1. Completeness: Do all sub-tasks cover the requirements of the original query?
+2. Feasibility: Is the selected MCP appropriate for each task?
+3. Logic: Are the task order and dependencies reasonable?
 
-输出JSON格式:
+Output JSON format:
 {{
   "is_valid": true/false,
   "issues": [
     {{
       "type": "completeness/feasibility/logic",
-      "description": "具体问题描述",
+      "description": "Specific issue description",
       "affected_tasks": ["task_id"]
     }}
   ],
-  "score": 0-10的评分
+  "score": 0-10 rating
 }}
 
-只输出JSON，不要其他文字。
+Output only JSON, no other text.
 """
         return prompt

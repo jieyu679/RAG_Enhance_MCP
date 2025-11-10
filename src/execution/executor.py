@@ -3,34 +3,34 @@ from src.core.llm_client import Qwen3Client
 import time
 
 class MCPExecutor:
-    """MCP执行器"""
+    """MCP Executor"""
     
     def __init__(self, llm_client: Qwen3Client):
         self.llm = llm_client
     
     def execute(self, task: Task, mcp: MCPMetadata, context: dict = None) -> ExecutionResult:
         """
-        执行任务
+        Execute task
         
         Args:
-            task: 待执行的任务
-            mcp: 选定的MCP
-            context: 上下文信息（如前置任务的结果）
+            task: Task to execute
+            mcp: Selected MCP
+            context: Context information (e.g., results from prerequisite tasks)
         
         Returns:
             ExecutionResult
         """
         start_time = time.time()
         
-        # 构建执行提示词
+        # Build execution prompt
         prompt = self._build_execution_prompt(task, mcp, context)
         
         messages = [
-            {"role": "system", "content": f"你是一个{mcp.name}工具。"},
+            {"role": "system", "content": f"You are a {mcp.name} tool."},
             {"role": "user", "content": prompt}
         ]
         
-        # 调用LLM执行
+        # Call LLM for execution
         response = self.llm.chat(messages)
         
         execution_time = time.time() - start_time
@@ -39,7 +39,7 @@ class MCPExecutor:
             return ExecutionResult(
                 success=False,
                 output=None,
-                error_message=response.get("error", "未知错误"),
+                error_message=response.get("error", "Unknown error"),
                 token_count=0,
                 execution_time=execution_time
             )
@@ -49,22 +49,22 @@ class MCPExecutor:
             output=response["content"],
             token_count=response["tokens"],
             execution_time=execution_time,
-            quality_score=0.8  # 简化版：固定评分
+            quality_score=0.8  # Simplified: fixed score
         )
     
     def _build_execution_prompt(self, task: Task, mcp: MCPMetadata, context: dict) -> str:
-        """构建执行提示词"""
+        """Build execution prompt"""
         context_str = ""
         if context and context.get("previous_results"):
-            context_str = "\n可用的前置任务结果:\n"
+            context_str = "\nAvailable results from prerequisite tasks:\n"
             for task_id, result in context["previous_results"].items():
                 context_str += f"- {task_id}: {result}\n"
         
         prompt = f"""
-你需要完成以下任务: {task.description}
+You need to complete the following task: {task.description}
 
 {context_str}
 
-请直接输出结果，不要有多余的解释。
+Please output the result directly without unnecessary explanations.
 """
         return prompt
